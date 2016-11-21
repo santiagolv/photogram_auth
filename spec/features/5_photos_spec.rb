@@ -5,18 +5,32 @@ do_not_show_tests_in_browser = false
 
 feature "Photos:", js: do_not_show_tests_in_browser do
 
-  scenario "only show edit/delete for signed-in user's photos", points: 2 do
+  scenario "only show edit for signed-in user's photos", points: 2 do
+    user_1 = FactoryGirl.create :user, :username => "1", :email => "1@m.com"
+    user_2 = FactoryGirl.create :user, :username => "2", :email => "2@m.com"
+    photo_1 = FactoryGirl.create :photo, :user_id => user_1.id
+    photo_2 = FactoryGirl.create :photo, :user_id => user_2.id
+    login_as user_2, :scope => :user
+
+    visit "/photos/#{photo_1.id}"
+    expect(page).not_to have_link("Edit")
+
+    visit "/photos/#{photo_2.id}"
+    expect(page).to have_link("Edit")
+
+  end
+
+  scenario "only show delete for signed-in user's photos", points: 2 do
     user_1 = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
     user_2 = FactoryGirl.create(:user, :username => "2", :email => "2@m.com")
     photo_1 = FactoryGirl.create(:photo, :user_id => user_1.id)
     photo_2 = FactoryGirl.create(:photo, :user_id => user_2.id)
     login_as(user_2, :scope => :user)
 
-    visit "/photos"
-
-    expect(page).not_to have_link(nil, href: "/photos/#{photo_1.id}/edit")
+    visit "/photos/#{photo_1.id}"
     expect(page).not_to have_link(nil, href: "/delete_photo/#{photo_1.id}")
-    expect(page).to have_link(nil, href: "/photos/#{photo_2.id}/edit")
+
+    visit "/photos/#{photo_2.id}"
     expect(page).to have_link(nil, href: "/delete_photo/#{photo_2.id}")
   end
 

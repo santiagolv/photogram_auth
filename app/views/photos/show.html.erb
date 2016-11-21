@@ -8,10 +8,10 @@
       </a>
       <% if current_user.id == @photo.user_id %>
         <a href="/photos/<%= @photo.id %>/edit" class="btn btn-warning">
-          <i class="fa fa-edit"></i>
+          Edit
         </a>
         <a href="/delete_photo/<%= @photo.id %>" class="btn btn-danger" rel="nofollow">
-          <i class="fa fa-trash-o"></i>
+          Delete
         </a>
       <% end %>
     </div>
