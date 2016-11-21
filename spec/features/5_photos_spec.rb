@@ -5,7 +5,7 @@ do_not_show_tests_in_browser = false
 
 feature "Photos:", js: do_not_show_tests_in_browser do
 
-  scenario "only the owner can see the edit button", points: 2 do
+  scenario "only the owner can see the edit button", points: 2, hint: "Use an 'if' statement in the view template" do
     alice = create :user, username: "alice", email: "alice@example.com"
     bob = create :user, username: "bob", email: "bob@example.com"
 
@@ -21,7 +21,7 @@ feature "Photos:", js: do_not_show_tests_in_browser do
     expect(page).to have_link("Edit")
   end
 
-  scenario "only the owner can see the delete button", points: 2 do
+  scenario "only the owner can see the delete button", points: 2, hint: "Use an 'if' statement in the view template" do
     alice = create :user, username: "alice", email: "alice@example.com"
     bob = create :user, username: "bob", email: "bob@example.com"
     alices_photo = create :photo, user_id: alice.id
@@ -35,7 +35,7 @@ feature "Photos:", js: do_not_show_tests_in_browser do
     expect(page).to have_link(nil, href: "/delete_photo/#{bobs_photo.id}")
   end
 
-  scenario "in /photos, Bootstrap panels used", points: 1 do
+  scenario "Bootstrap panels used on index page", points: 1 do
     user = create :user
     photo = create :photo, user_id: user.id
     login_as(user, scope: :user)
@@ -45,7 +45,7 @@ feature "Photos:", js: do_not_show_tests_in_browser do
     expect(page).to have_css(".panel")
   end
 
-  scenario "in /photos, Font Awesome fa-plus icon used (and 'Photos' h1 tag isn't)", points: 1 do
+  scenario "Font Awesome fa-plus icon used in add photo button on index page", points: 1 do
     user = create :user
     photo = create :photo, user_id: user.id
     login_as(user, scope: :user)
@@ -53,7 +53,6 @@ feature "Photos:", js: do_not_show_tests_in_browser do
     visit "/photos"
 
     expect(page).to have_css(".fa-plus")
-    expect(page).not_to have_selector("h1", text: "Photos")
   end
 
   scenario "/photos displays per-photo username, photo, and time elapsed", points: 1, hint: "Time elapsed ends in 'ago' (e.g., '5 months ago')." do
