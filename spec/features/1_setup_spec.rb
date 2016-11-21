@@ -5,7 +5,7 @@ do_not_show_tests_in_browser = false
 
 feature "Devise:", js: do_not_show_tests_in_browser do
 
-  scenario "root url set to photos index", points: 1 do
+  scenario "root url set to photos index", points: 1, hint: "If you see `uninitialized constant Warden`, make sure to add the devise gem in your gemfile and bundles" do
     user = create(:user)
 
     visit "/"
