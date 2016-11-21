@@ -1,0 +1,53 @@
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+    <!-- Validation failure messages -->
+    <% if @comment.errors.any? %>
+      <% @comment.errors.full_messages.each do |message| %>
+        <div class="alert alert-dismissable alert-danger">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%= message %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Add Comment
+        </h3>
+      </div>
+
+      <div class="panel-body">
+        <form action="/create_comment" method="post">
+          <!-- Hidden input for authenticity token to protect from forgery -->
+          <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+
+          <input type="hidden" id="photo_id" name="photo_id" value="<%= @comment.photo_id %>">
+
+          <input type="hidden" id="user_id" name="user_id" value="<%= @comment.user_id %>">
+
+          <!-- Label and input for body -->
+          <div class="form-group">
+            <label for="body" class="sr-only">
+              Body
+            </label>
+
+            <input id="body" name="body" placeholder="Add a comment..." class="form-control" value="3"><%= @comment.body %></textarea>
+          </div>
+
+          <div class="form-group">
+            <button class="btn btn-success btn-block">
+              Create Comment
+            </button>
+          </div>
+
+          <div class="form-group">
+            <a href="/photos" class="btn btn-link btn-block">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
