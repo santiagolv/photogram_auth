@@ -6,7 +6,7 @@ do_not_show_tests_in_browser = false
 feature "Devise:", js: do_not_show_tests_in_browser do
 
   scenario "root url set to photos index", points: 1 do
-    user = FactoryGirl.create(:user)
+    user = create(:user)
 
     visit "/"
     if page.has_selector?("label", text: "Email")
