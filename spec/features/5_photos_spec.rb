@@ -5,39 +5,40 @@ do_not_show_tests_in_browser = false
 
 feature "Photos:", js: do_not_show_tests_in_browser do
 
-  scenario "only show edit for signed-in user's photos", points: 2 do
-    user_1 = FactoryGirl.create :user, :username => "1", :email => "1@m.com"
-    user_2 = FactoryGirl.create :user, :username => "2", :email => "2@m.com"
-    photo_1 = FactoryGirl.create :photo, :user_id => user_1.id
-    photo_2 = FactoryGirl.create :photo, :user_id => user_2.id
-    login_as user_2, :scope => :user
+  scenario "only the owner can see the edit button", points: 2 do
+    alice = create :user, username: "alice", email: "alice@example.com"
+    bob = create :user, username: "bob", email: "bob@example.com"
 
-    visit "/photos/#{photo_1.id}"
+    alices_photo = create :photo, user_id: alice.id
+    bobs_photo = create :photo, user_id: bob.id
+
+    login_as bob, scope: :user
+
+    visit "/photos/#{alices_photo.id}"
     expect(page).not_to have_link("Edit")
 
-    visit "/photos/#{photo_2.id}"
+    visit "/photos/#{bobs_photo.id}"
     expect(page).to have_link("Edit")
-
   end
 
-  scenario "only show delete for signed-in user's photos", points: 2 do
-    user_1 = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
-    user_2 = FactoryGirl.create(:user, :username => "2", :email => "2@m.com")
-    photo_1 = FactoryGirl.create(:photo, :user_id => user_1.id)
-    photo_2 = FactoryGirl.create(:photo, :user_id => user_2.id)
-    login_as(user_2, :scope => :user)
+  scenario "only the owner can see the delete button", points: 2 do
+    alice = create :user, username: "alice", email: "alice@example.com"
+    bob = create :user, username: "bob", email: "bob@example.com"
+    alices_photo = create :photo, user_id: alice.id
+    bobs_photo = create :photo, user_id: bob.id
+    login_as(bob, scope: :user)
 
-    visit "/photos/#{photo_1.id}"
-    expect(page).not_to have_link(nil, href: "/delete_photo/#{photo_1.id}")
+    visit "/photos/#{alices_photo.id}"
+    expect(page).not_to have_link(nil, href: "/delete_photo/#{alices_photo.id}")
 
-    visit "/photos/#{photo_2.id}"
-    expect(page).to have_link(nil, href: "/delete_photo/#{photo_2.id}")
+    visit "/photos/#{bobs_photo.id}"
+    expect(page).to have_link(nil, href: "/delete_photo/#{bobs_photo.id}")
   end
 
   scenario "in /photos, Bootstrap panels used", points: 1 do
-    user = FactoryGirl.create(:user)
-    photo = FactoryGirl.create(:photo, :user_id => user.id)
-    login_as(user, :scope => :user)
+    user = create :user
+    photo = create :photo, user_id: user.id
+    login_as(user, scope: :user)
 
     visit "/photos"
 
@@ -45,9 +46,9 @@ feature "Photos:", js: do_not_show_tests_in_browser do
   end
 
   scenario "in /photos, Font Awesome fa-plus icon used (and 'Photos' h1 tag isn't)", points: 1 do
-    user = FactoryGirl.create(:user)
-    photo = FactoryGirl.create(:photo, :user_id => user.id)
-    login_as(user, :scope => :user)
+    user = create :user
+    photo = create :photo, user_id: user.id
+    login_as(user, scope: :user)
 
     visit "/photos"
 
@@ -56,25 +57,25 @@ feature "Photos:", js: do_not_show_tests_in_browser do
   end
 
   scenario "/photos displays per-photo username, photo, and time elapsed", points: 1, hint: "Time elapsed ends in 'ago' (e.g., '5 months ago')." do
-    user_1 = FactoryGirl.create(:user, :username => "user_1", :email => "1@m.com")
-    user_2 = FactoryGirl.create(:user, :username => "user_2", :email => "2@m.com")
-    user_3 = FactoryGirl.create(:user, :username => "Three", :email => "three@m.com")
-    photo_1 = FactoryGirl.create(:photo, :user_id => user_1.id)
-    photo_2 = FactoryGirl.create(:photo, :user_id => user_2.id)
-    login_as(user_3, :scope => :user)
+    alice = create :user, :username => "alice", :email => "1@m.com"
+    bob = create :user, :username => "bob", :email => "2@m.com"
+    user_3 = create :user, :username => "Three", :email => "three@m.com"
+    alices_photo = create :photo, user_id: alice.id
+    bobs_photo = create :photo, user_id: bob.id
+    login_as(user_3, scope: :user)
 
     visit "/photos"
 
-    expect(page).to have_content("#{photo_1.user.username}")
-    expect(page).to have_css("img[src*='#{photo_1.image}']")
-    expect(page).to have_content("#{photo_2.user.username}")
-    expect(page).to have_css("img[src*='#{photo_2.image}']")
+    expect(page).to have_content("#{alices_photo.user.username}")
+    expect(page).to have_css("img[src*='#{alices_photo.image}']")
+    expect(page).to have_content("#{bobs_photo.user.username}")
+    expect(page).to have_css("img[src*='#{bobs_photo.image}']")
     expect(page).to have_content("ago")
   end
 
   scenario "header uses Font Awesome fa-sign-out icon", points: 1 do
-    user = FactoryGirl.create(:user)
-    login_as(user, :scope => :user)
+    user = create :user
+    login_as(user, scope: :user)
 
     visit "/photos"
 
@@ -84,15 +85,15 @@ feature "Photos:", js: do_not_show_tests_in_browser do
   end
 
   scenario "/photos lists comments with authors", points: 1 do
-    user_1 = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
-    user_2 = FactoryGirl.create(:user, :username => "2", :email => "2@m.com")
-    user_3 = FactoryGirl.create(:user, :username => "Three", :email => "three@m.com")
-    photo_1 = FactoryGirl.create(:photo, :user_id => user_3.id)
-    photo_2 = FactoryGirl.create(:photo, :user_id => user_3.id)
-    photo_3 = FactoryGirl.create(:photo, :user_id => user_3.id)
-    comment_1 = FactoryGirl.create(:comment, :user_id => user_1.id, :body => "comment_1", :photo_id => photo_1.id)
-    comment_2 = FactoryGirl.create(:comment, :user_id => user_2.id, :body => "comment_two", :photo_id => photo_3.id)
-    login_as(user_3, :scope => :user)
+    alice = create :user, username: "alice", email: "alice@example.com"
+    bob = create :user, username: "bob", email: "bob@example.com"
+    user_3 = create :user, :username => "Three", :email => "three@m.com"
+    alices_photo = create :photo, user_id: user_3.id
+    bobs_photo = create :photo, user_id: user_3.id
+    photo_3 = create :photo, user_id: user_3.id
+    comment_1 = create :comment, user_id: alice.id, :body => "comment_1", :photo_id => alices_photo.id
+    comment_2 = create :comment, user_id: bob.id, :body => "comment_two", :photo_id => photo_3.id
+    login_as(user_3, scope: :user)
 
     visit "/photos"
 
@@ -103,13 +104,13 @@ feature "Photos:", js: do_not_show_tests_in_browser do
   end
 
   scenario "/photos shows Font Awesome heart icons to add/delete likes", points: 1, hint: "Font Awesome icon classes: fa-heart and fa-heart-o." do
-    user_1 = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
-    user_2 = FactoryGirl.create(:user, :username => "2", :email => "2@m.com")
-    photo_1 = FactoryGirl.create(:photo, :user_id => user_2.id)
-    photo_2 = FactoryGirl.create(:photo, :user_id => user_2.id)
-    like_1 = FactoryGirl.create(:like, :user_id => user_1.id, :photo_id => photo_1.id)
-    like_2 = FactoryGirl.create(:like, :user_id => user_2.id, :photo_id => photo_2.id)
-    login_as(user_1, :scope => :user)
+    alice = create :user, username: "alice", email: "alice@example.com"
+    bob = create :user, username: "bob", email: "bob@example.com"
+    alices_photo = create :photo, user_id: bob.id
+    bobs_photo = create :photo, user_id: bob.id
+    like_1 = create :like, user_id: alice.id, :photo_id => alices_photo.id
+    like_2 = create :like, user_id: bob.id, :photo_id => bobs_photo.id
+    login_as(alice, scope: :user)
 
     visit "/photos"
 
@@ -118,9 +119,9 @@ feature "Photos:", js: do_not_show_tests_in_browser do
   end
 
   scenario "/photos includes form field with placeholder 'Add a comment...'", points: 1 do
-    user = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
-    photo = FactoryGirl.create(:photo, :user_id => user.id)
-    login_as(user, :scope => :user)
+    user = create :user, username: "alice", email: "alice@example.com"
+    photo = create :photo, user_id: user.id
+    login_as(user, scope: :user)
 
     visit "/photos"
 
@@ -131,10 +132,10 @@ end
 feature "Photos:", js: show_tests_in_browser do
 
   scenario "quick-add a comment works and leads back to /photos", points: 2 do
-    user_1 = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
-    user_2 = FactoryGirl.create(:user, :username => "user_2", :email => "two@m.com")
-    photo = FactoryGirl.create(:photo, :user_id => user_1.id)
-    login_as(user_2, :scope => :user)
+    alice = create :user, username: "alice", email: "alice@example.com"
+    bob = create :user, :username => "bob", :email => "two@m.com"
+    photo = create :photo, user_id: alice.id
+    login_as(bob, scope: :user)
 
     visit "/photos"
     new_comment = "Just added a comment at #{Time.now.to_f}"
@@ -146,10 +147,10 @@ feature "Photos:", js: show_tests_in_browser do
   end
 
   scenario "quick-add a comment sets the author correctly", points: 1, hint: "Test assumes that each row in /comments lists either the author's ID or username." do
-    user_1 = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
-    user_2 = FactoryGirl.create(:user, :username => "user_2", :email => "two@m.com", :id => "#{Time.now.to_i}")
-    photo = FactoryGirl.create(:photo, :user_id => user_1.id)
-    login_as(user_2, :scope => :user)
+    alice = create :user, username: "alice", email: "alice@example.com"
+    bob = create :user, :username => "bob", :email => "two@m.com", :id => "#{Time.now.to_i}"
+    photo = create :photo, user_id: alice.id
+    login_as(bob, scope: :user)
 
     visit "/photos"
     new_comment = "Just added a comment at #{Time.now.to_f + Time.now.to_f}"
@@ -159,18 +160,18 @@ feature "Photos:", js: show_tests_in_browser do
 
     expect(page).to have_content(new_comment)
     within('tr', text: new_comment) do
-      if page.has_content?(user_2.id)
-        expect(page).to have_content(user_2.id)
+      if page.has_content?(bob.id)
+        expect(page).to have_content(bob.id)
       else
-        expect(page).to have_content(user_2.username)
+        expect(page).to have_content(bob.username)
       end
     end
   end
 
   scenario "quick-add a like works in /photos", points: 2 do
-    user = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
-    photo = FactoryGirl.create(:photo, :user_id => user.id)
-    login_as(user, :scope => :user)
+    user = create :user, username: "alice", email: "alice@example.com"
+    photo = create :photo, user_id: user.id
+    login_as(user, scope: :user)
 
     visit "/photos"
     find(".fa-heart-o").click
@@ -179,10 +180,10 @@ feature "Photos:", js: show_tests_in_browser do
   end
 
   scenario "quick-delete a like works in /photos", points: 1 do
-    user = FactoryGirl.create(:user, :username => "1", :email => "1@m.com")
-    photo = FactoryGirl.create(:photo, :user_id => user.id)
-    like = FactoryGirl.create(:like, :user_id => user.id, :photo_id => photo.id)
-    login_as(user, :scope => :user)
+    user = create :user
+    photo = create :photo, user_id: user.id
+    like = create :like, user_id: user.id, :photo_id => photo.id
+    login_as(user, scope: :user)
 
     visit "/photos"
 
