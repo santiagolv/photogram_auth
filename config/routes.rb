@@ -34,7 +34,9 @@ Rails.application.routes.draw do
   post "/update_like/:id", :controller => "likes", :action => "update"
 
   # DELETE
-  get "/delete_like/:id", :controller => "likes", :action => "destroy"
+  get "/delete_like/:like_to_destroy", :controller => "likes", :action => "destroy"
+  post "/delete_like/:like_to_destroy", :controller => "likes", :action => "destroy"
+
   #------------------------------
 
   # Routes for the Photo resource:

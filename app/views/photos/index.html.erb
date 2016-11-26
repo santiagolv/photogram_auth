@@ -32,6 +32,17 @@
                   <img src="<%=photo.image%>" class="img-responsive"/>
                 </a>
                 <p/>
+                <% if photo.fans.pluck(:user_id).include? current_user.id%>
+                <%  like_to_delete = Like.where(user_id:current_user.id.to_i, photo_id:photo.id.to_i).pluck(:id)%>
+                <% like_to_delete[0].to_s%>
+                <form action="/delete_like/<%=like_to_delete[0].to_s%>" method="post">
+                  <input name="authenticity_token" type="hidden" value="<%=form_authenticity_token%>"/>
+                  <input type="hidden" name="like_id" value="<%=like_to_delete[0].to_s%>"/>
+                  <button class="btn btn-link">
+                    <i class="fa fa-heart"/></i>
+                  </button>
+                </form>
+                <%else%>
                 <form action="/create_like/<%=current_user.id.to_i%>/<%=photo.id%>" method="post">
                   <input name="authenticity_token" type="hidden" value="<%=form_authenticity_token%>"/>
                   <input type="hidden" name="photo_id" value="<%=photo.id%>"/>
@@ -39,82 +50,85 @@
                   <button class="btn btn-link">
                     <% if photo.likes.count == 0%>
                     <i class="fa fa-heart-o"/></i>
+                    <small class="text-muted">be the first to like this</small>
+                    <% else %>
+                    <i class="fa fa-heart-o"/></i>
+                    <%end%>
                   </button>
-                  <small class="text-muted">be the first to like this</small>
-                  <% else %>
-                  <i class="fa fa-heart"/></i>
-                </button>
+                </form>
+                <%end%>
+
                 <% if photo.likes.count == 1%>
                 <small class="text-muted"><%= photo.fans.pluck(:username).to_sentence %> likes this</small>
                 <% else %>
                 <small class="text-muted"><%= photo.fans.pluck(:username).to_sentence %> like this</small>
-                <%end%>
-                <%end%>
-              </form>
-              <p/>
-              <ul class="media-list">
-                <li class="media">
-                  <div class="media-body">
-                    <h6 class="media-heading">
-                      <a href="/users/<%=photo.id%>"><%=photo.user.username%></a>
-                      <small><%=time_ago_in_words(photo.created_at)%> ago</small>
-                    </h6>
-                    <%=photo.caption%>
-                  </div>
-                </li>
-                <li class="media">
 
-                  <% @comments.each do |comment| %>
-                  <% if comment.photo_id == photo.id %>
+                <%end%>
+
+                <p/>
+                <ul class="media-list">
                   <li class="media">
                     <div class="media-body">
                       <h6 class="media-heading">
-                        <a href="/users/<%= photo.user_id %>"><%= comment.user.username %></a>
+                        <a href="/users/<%=photo.id%>"><%=photo.user.username%></a>
+                        <small><%=time_ago_in_words(photo.created_at)%> ago</small>
                       </h6>
-                      <%= comment.body %>
-
+                      <%=photo.caption%>
                     </div>
                   </li>
-                  <%end%>
+                  <li class="media">
 
-                  <% end %>
-                  <div class="media-body">
-                    <form action="/create_comment" method="post">
-                      <input name="authenticity_token" type="hidden" value="<%=form_authenticity_token%>"/>
-                      <input type="hidden" name="photo_id" value="<%=photo.id%>"/>
-                      <input type="hidden" name="user_id" value="<%=current_user.id.to_i%>"/>
-                      <div class="form-group">
-                        <label for="body" class="sr-only">Body</label>
-                        <input type="text" id="body" name="body" placeholder="Add a comment..." class="form-control" required=""/>
+                    <% @comments.each do |comment| %>
+                    <% if comment.photo_id == photo.id %>
+                    <li class="media">
+                      <div class="media-body">
+                        <h6 class="media-heading">
+                          <a href="/users/<%= photo.user_id %>"><%= comment.user.username %></a>
+                        </h6>
+                        <%= comment.body %>
+
                       </div>
-                    </form>
-                  </div>
-                  <% if current_user.id == photo.user_id%>
-                  <div class="btn-group btn-group-justified">
-                    <a href="/photos" class="btn btn-primary">
-                      Back
-                    </a>
-                    <a href="/photos/<%= photo.id %>/edit" class="btn btn-warning">
-                      Edit
-                    </a>
-                    <a href="/delete_photo/<%= photo.id %>" class="btn btn-danger" rel="nofollow">
-                      Delete
-                    </a>
-                  </div>
-                  <%end%>
-                </li>
-              </ul>
+                    </li>
+                    <%end%>
+
+                    <% end %>
+                    <div class="media-body">
+                      <form action="/create_comment" method="post">
+                        <input name="authenticity_token" type="hidden" value="<%=form_authenticity_token%>"/>
+                        <input type="hidden" name="photo_id" value="<%=photo.id%>"/>
+                        <input type="hidden" name="user_id" value="<%=current_user.id.to_i%>"/>
+                        <div class="form-group">
+                          <label for="body" class="sr-only">Body</label>
+                          <input type="text" id="body" name="body" placeholder="Add a comment..." class="form-control" required=""/>
+                        </div>
+                      </form>
+                    </div>
+                    <% if current_user.id == photo.user_id%>
+                    <div class="btn-group btn-group-justified">
+                      <a href="/photos" class="btn btn-primary">
+                        Back
+                      </a>
+                      <a href="/photos/<%= photo.id %>/edit" class="btn btn-warning">
+                        Edit
+                      </a>
+                      <a href="/delete_photo/<%= photo.id %>" class="btn btn-danger" rel="nofollow">
+                        Delete
+                      </a>
+                    </div>
+                    <%end%>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <% end%>
+        <% end%>
 
 
 
 
 
-    </table>
+      </table>
+    </div>
   </div>
-</div>
 </div>

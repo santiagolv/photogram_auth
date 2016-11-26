@@ -11,6 +11,8 @@ class LikesController < ApplicationController
     render("likes/show.html.erb")
   end
 
+
+
   def show_proprietary
     @user = User.find(current_user.id)
     @likes = Like.new
@@ -62,7 +64,7 @@ class LikesController < ApplicationController
   end
 
   def destroy
-    @like = Like.find(params[:id])
+    @like = Like.find(params[:like_to_destroy])
 
     @like.destroy
 
