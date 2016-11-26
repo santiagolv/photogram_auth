@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   # Routes for the Like resource:
   # CREATE
   get "/likes/new", :controller => "likes", :action => "new"
-  post "/create_like", :controller => "likes", :action => "create"
+  post "/create_like/:user_id/:photo_id", :controller => "likes", :action => "create"
 
   # READ
   get "/likes", :controller => "likes", :action => "index"
@@ -47,6 +47,7 @@ Rails.application.routes.draw do
   get "/photos/:id", :controller => "photos", :action => "show"
 
   # UPDATE
+
   get "/photos/:id/edit", :controller => "photos", :action => "edit"
   post "/update_photo/:id", :controller => "photos", :action => "update"
 

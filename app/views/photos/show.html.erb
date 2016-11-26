@@ -9,12 +9,13 @@
       <dd><%= @photo.caption %></dd>
 
       <dt>Image</dt>
-      <dd><%= @photo.image %></dd>
+      <dd><img src="<%= @photo.image %>" class="img-responsive"></dd>
 
       <dt>User</dt>
       <dd><%= @photo.user_id %></dd>
 
     </dl>
+    <% if current_user.id == @photo.user_id%>
     <div class="btn-group btn-group-justified">
       <a href="/photos" class="btn btn-primary">
         Back
@@ -26,5 +27,6 @@
         Delete
       </a>
     </div>
+    <% end%>
   </div>
 </div>

@@ -16,7 +16,7 @@
 
       <% @likes.each do |like| %>
       <tr>
-        <td><%= like.user_id %></td>
+        <td><%= like.user.username %></td>
         <td><%= like.photo_id %></td>
         <td>
           <a href="/likes/<%= like.id %>" class="btn btn-primary">Show</a>

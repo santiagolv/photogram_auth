@@ -1,7 +1,7 @@
 class PhotosController < ApplicationController
   def index
     @photos = Photo.all
-
+    @comments = Comment.all
     render("photos/index.html.erb")
   end
 
@@ -34,6 +34,7 @@ class PhotosController < ApplicationController
   end
 
   def edit
+    
     @photo = Photo.find(params[:id])
 
     render("photos/edit.html.erb")
