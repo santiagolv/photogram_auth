@@ -1,35 +1,38 @@
-<div class="page-header">
-  <h1>
-    Photos
-    <a href="/photos/new" class="btn btn-lg btn-success">New Photo</a>
-  </h1>
-</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2" style="padding-top:15px;">
+      <a href="/photos/new" class="btn btn-default btn-block">
+        <i class="fa fa-plus"/></i>
+      </a>
+      <hr/>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-striped table-hover">
+        <tr>
+          <th>Caption</th>
+          <th>Image</th>
+          <th>User</th>
+          <th>Actions</th>
+        </tr>
 
-<div class="row">
-  <div class="col-md-12">
-    <table class="table table-striped table-hover">
-      <tr>
-        <th>Caption</th>
-        <th>Image</th>
-        <th>User</th>
-        <th>Actions</th>
-      </tr>
+        <% @photos.each do |photo| %>
+        <tr>
+          <td><%= photo.caption %></td>
+          <td><img src="<%= photo.image %>" width="200"></td>
+          <td><%= photo.user_id %></td>
 
-      <% @photos.each do |photo| %>
-      <tr>
-        <td><%= photo.caption %></td>
-        <td><img src="<%= photo.image %>" width="200"></td>
-        <td><%= photo.user_id %></td>
-
-        <td>
-          <%if photo.user_id == current_user.id %>
-          <a href="/photos/<%= photo.id %>" class="btn btn-primary">Show</a>
-          <a href="/photos/<%= photo.id %>/edit" class="btn btn-warning">Edit</a>
-          <a href="/delete_photo/<%= photo.id %>" class="btn btn-danger" rel="nofollow">Delete</a>
-          <% end %>
-        </td>
-      </tr>
-      <% end %>
-    </table>
+          <td>
+            <%if photo.user_id == current_user.id %>
+            <a href="/photos/<%= photo.id %>" class="btn btn-primary">Show</a>
+            <a href="/photos/<%= photo.id %>/edit" class="btn btn-warning">Edit</a>
+            <a href="/delete_photo/<%= photo.id %>" class="btn btn-danger" rel="nofollow">Delete</a>
+            <% end %>
+          </td>
+        </tr>
+        <% end %>
+      </table>
+    </div>
   </div>
 </div>
